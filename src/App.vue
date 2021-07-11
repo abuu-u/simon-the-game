@@ -61,13 +61,20 @@ export default defineComponent({
       { text: 'сложный', speed: 400 },
     ]
 
+    const audio = [
+      new Audio('../src/assets/1.mp3'),
+      new Audio('../src/assets/2.mp3'),
+      new Audio('../src/assets/3.mp3'),
+      new Audio('../src/assets/4.mp3'),
+    ]
+
     const difficulty = ref(difficultyLevels[0])
 
     const buttons = ref([
-      { audio: './assets/1.ogg', highlight: false },
-      { audio: './assets/2.ogg', highlight: false },
-      { audio: './assets/3.ogg', highlight: false },
-      { audio: './assets/4.ogg', highlight: false },
+      { highlight: false },
+      { highlight: false },
+      { highlight: false },
+      { highlight: false },
     ])
 
     const round = ref(0)
@@ -79,6 +86,7 @@ export default defineComponent({
 
     const hightlightButton = (index: number) => {
       buttons.value[index].highlight = true
+      audio[index].play()
 
       setTimeout(() => (buttons.value[index].highlight = false), 300)
     }
@@ -94,7 +102,6 @@ export default defineComponent({
         if (gameState.value === GameState.difficultyChanged) {
           clearInterval(interval)
           reset()
-          gameState.value = GameState.canPlay
         } else {
           hightlightButton(game.value[i])
           i++
