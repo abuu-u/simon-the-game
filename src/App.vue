@@ -14,7 +14,7 @@
   <form @submit.prevent>
     <p>Round: {{ round }}</p>
 
-    <button class="from-button" @click="handleStartClick">Start</button>
+    <button class="form-button" @click="handleStartClick">Start</button>
 
     <p v-if="gameState === GameState.lost">
       Вы проиграли на {{ lostRound }} раунде
@@ -43,6 +43,10 @@
 
 <script lang="ts">
 import { defineComponent, ref, watch } from 'vue'
+import audio1 from '../src/assets/1.mp3'
+import audio2 from '../src/assets/2.mp3'
+import audio3 from '../src/assets/3.mp3'
+import audio4 from '../src/assets/4.mp3'
 
 export default defineComponent({
   name: 'App',
@@ -62,10 +66,10 @@ export default defineComponent({
     ]
 
     const audio = [
-      new Audio('../src/assets/1.mp3'),
-      new Audio('../src/assets/2.mp3'),
-      new Audio('../src/assets/3.mp3'),
-      new Audio('../src/assets/4.mp3'),
+      () => new Audio(audio1),
+      () => new Audio(audio2),
+      () => new Audio(audio3),
+      () => new Audio(audio4),
     ]
 
     const difficulty = ref(difficultyLevels[0])
@@ -86,7 +90,7 @@ export default defineComponent({
 
     const hightlightButton = (index: number) => {
       buttons.value[index].highlight = true
-      audio[index].play()
+      audio[index]().play()
 
       setTimeout(() => (buttons.value[index].highlight = false), 300)
     }
@@ -102,6 +106,7 @@ export default defineComponent({
         if (gameState.value === GameState.difficultyChanged) {
           clearInterval(interval)
           reset()
+          gameState.value = GameState.initial
         } else {
           hightlightButton(game.value[i])
           i++
@@ -152,6 +157,10 @@ export default defineComponent({
     watch(round, (_, prevVal) => (lostRound.value = prevVal))
 
     watch(difficulty, () => {
+      if (gameState.value === GameState.initial) {
+        return
+      }
+
       gameState.value = GameState.difficultyChanged
     })
 
@@ -187,7 +196,8 @@ $border-radiuses: 100% 0 0 0, 0 100% 0 0, 0 0 0 100%, 0 0 100% 0;
 
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-evenly;
+  gap: 50px;
+  justify-content: center;
 }
 
 html,
@@ -204,9 +214,21 @@ h1 {
   width: 100%;
 }
 
+ul,
+form {
+  max-width: 50%;
+
+  @media screen and (max-width: 950px) {
+    & {
+      max-width: 100%;
+    }
+  }
+}
+
 ul {
   list-style: none;
   padding: 0;
+  margin: 0;
   display: flex;
   width: $button-width * 2 + $gap;
   flex-wrap: wrap;
@@ -249,5 +271,16 @@ fieldset {
   margin: 0;
   padding: 0;
   border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+}
+
+.form-button {
+  margin-bottom: 10px;
+}
+
+legend {
+  margin-bottom: 20px;
 }
 </style>
